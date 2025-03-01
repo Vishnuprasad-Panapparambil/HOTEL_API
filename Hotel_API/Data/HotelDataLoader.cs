@@ -14,7 +14,22 @@ namespace Hotel_API.Data
             var json = File.ReadAllText(filepath);
             if (string.IsNullOrEmpty(json))
                 throw new ArgumentException("The JSON content cannot be null or empty..!");
-            return JsonSerializer.Deserialize<List<Hotel>>(json)!;
+
+
+            try
+            {
+                var hotels = JsonSerializer.Deserialize<List<Hotel>>(json)!;
+                if (hotels.Any(h => h.id <= 0))
+                {
+                    throw new InvalidDataException("One or more hotels have an invalid or missing ID. ID should be a positive numeric value.");
+                }
+                return hotels;
+
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidDataException("The JSON content is invalid..!!", ex);
+            }
 
 
 
